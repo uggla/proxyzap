@@ -1,7 +1,7 @@
 # proxyzap
 A simple script to change Gnome3 proxy settings based on connected subnet
 
-[Screenshot1](screenshots/1.png)
+[Screenshot1](screenshots/screenshot1.png)
 
 
 # Installation
