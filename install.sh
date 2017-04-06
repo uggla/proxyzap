@@ -32,3 +32,7 @@ EOF
 if [[ ! -L ~/.config/systemd/user/proxyzap.service ]]; then
 	ln -s $CURRENTDIR/proxyzap.service ~/.config/systemd/user/proxyzap.service
 fi
+
+# Start service
+systemctl --user start proxyzap.service
+
