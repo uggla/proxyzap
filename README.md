@@ -35,7 +35,7 @@ systemctl --user stop proxyzap.service
 
 # Configuration file
 
-```
+```ini
 [proxyzap]
 SUBGW = "192.168.0.254"
 PROXY = "myproxy.mydomain.local"
