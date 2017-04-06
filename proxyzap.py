@@ -85,9 +85,25 @@ def get_gw():
 
 class GnomeProxy(object):
 
-    """Manipulate Gnome proxy using gsettings"""
+    '''
+    Manipulate Gnome proxy using gsettings
+
+    This class relies on global variables
+    PROXY, PROXYPORT, PROXYIGNORE
+
+    PROXY is a string containing the proxy hostname
+    PROXYPORT is an integer containing the proxy port number
+    PROXYIGNORE is a list containing hosts or subnets that do not require
+    a proxy to connect to
+
+    Info from :
+    https://wiki.archlinux.org/index.php/Proxy_settings#Proxy_settings_on_GNOME3
+    https://marianochavero.wordpress.com/2012/04/03/short-example-of-gsettings-bindings-in-python/
+    https://developer.gnome.org/gio/2.30/GSettings.html#g-settings-set-value
+    '''
 
     def __init__(self):
+        ''' Initialize GnomeProxy '''
         self.proxy_mode = None
         self.proxy_ignore = None
         self.proxy_http_url = None
@@ -100,10 +116,7 @@ class GnomeProxy(object):
         self.get_proxy_settings()
 
     def get_proxy_settings(self):
-        """ Retrieve proxy values
-        Info from :
-        https://wiki.archlinux.org/index.php/Proxy_settings#Proxy_settings_on_GNOME3
-        """
+        ''' Retrieve proxy values '''
         gsettings = Gio.Settings.new("org.gnome.system.proxy")
         self.proxy_mode = str(
                 gsettings.get_value("mode")).replace("'", "")
@@ -132,7 +145,8 @@ class GnomeProxy(object):
                 gsettings.get_value("port")).replace("'", "")
 
     def set_proxy_settings(self, mode):
-        ''' Initialize a global logger to track application behaviour
+        '''
+        Set proxy values
 
         :param mode: "manual" or "none"
         :type mode: str
