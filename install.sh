@@ -29,10 +29,13 @@ WantedBy=default.target
 EOF
 
 # Add it to systemd user configuration
-if [[ ! -L ~/.config/systemd/user/proxyzap.service ]]; then
-	ln -s $CURRENTDIR/proxyzap.service ~/.config/systemd/user/proxyzap.service
+if [[ ! -f ~/.config/systemd/user/proxyzap.service ]]; then
+    # Use a physical link because symbolic link causes some
+    # systemd issues
+	ln $CURRENTDIR/proxyzap.service ~/.config/systemd/user/proxyzap.service
 fi
 
 # Start service
+systemctl --user enable proxyzap.service
 systemctl --user start proxyzap.service
 
