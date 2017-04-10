@@ -16,10 +16,15 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 try:
+    import gi
+    gi.require_version('Notify', '0.7')
     from gi.repository import Gio, GLib, Notify
 except ImportError:
     print('Package python3-gobject-base is missing.')
     print('Please install it using "dnf install python3-gobject-base".')
+    sys.exit(1)
+except ValueError:
+    print('Please ensure that libnotify is version 0.7.')
     sys.exit(1)
 
 
