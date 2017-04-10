@@ -103,22 +103,30 @@ class GnomeProxy(object):
     '''
     Manipulate Gnome proxy using gsettings
 
-    This class relies on global variables
-    PROXY, PROXYPORT, PROXYIGNORE
-
-    PROXY is a string containing the proxy hostname
-    PROXYPORT is an integer containing the proxy port number
-    PROXYIGNORE is a list containing hosts or subnets that do not require
-    a proxy to connect to
-
     Info from :
     https://wiki.archlinux.org/index.php/Proxy_settings#Proxy_settings_on_GNOME3
     https://marianochavero.wordpress.com/2012/04/03/short-example-of-gsettings-bindings-in-python/
     https://developer.gnome.org/gio/2.30/GSettings.html#g-settings-set-value
     '''
 
-    def __init__(self):
-        ''' Initialize GnomeProxy '''
+    def __init__(self, PROXY, PROXYPORT, PROXYIGNORE):
+        ''' Initialize GnomeProxy
+        Set proxy values
+
+        :param PROXY: proxy hostname
+        :type mode: str
+
+        :param PROXYPORT: proxy port number
+        :type mode: int
+
+        :param PROXYIGNORE: hosts or subnets that do not require
+        a proxy to connect to
+        :type mode: list
+
+        '''
+        self.PROXY = PROXY
+        self.PROXYPORT = PROXYPORT
+        self.PROXYIGNORE = PROXYIGNORE
         self.proxy_mode = None
         self.proxy_ignore = None
         self.proxy_http_url = None
@@ -167,43 +175,41 @@ class GnomeProxy(object):
         :type mode: str
 
         '''
-        global PROXY, PROXYPORT, PROXYIGNORE
-
         gsettings = Gio.Settings.new("org.gnome.system.proxy")
         gsettings.set_value(
                 "mode",
                 GLib.Variant('s', mode))
 
         if mode == 'manual':
-            if self.proxy_ignore != PROXYIGNORE:
+            if self.proxy_ignore != self.PROXYIGNORE:
                 # GLib.Variant('as', ['localhost', '127.0.0.0/8', '::1'])
                 gsettings = Gio.Settings.new("org.gnome.system.proxy")
                 gsettings.set_value(
                         "ignore-hosts",
-                        GLib.Variant('as', PROXYIGNORE))
+                        GLib.Variant('as', self.PROXYIGNORE))
 
-            if self.proxy_http_url != PROXY:
+            if self.proxy_http_url != self.PROXY:
                 gsettings = Gio.Settings.new("org.gnome.system.proxy.http")
                 gsettings.set_value(
                         "host",
-                        GLib.Variant('s', PROXY))
+                        GLib.Variant('s', self.PROXY))
                 gsettings.set_value(
                         "port",
-                        GLib.Variant('i', PROXYPORT))
+                        GLib.Variant('i', self.PROXYPORT))
                 gsettings = Gio.Settings.new("org.gnome.system.proxy.https")
                 gsettings.set_value(
                         "host",
-                        GLib.Variant('s', PROXY))
+                        GLib.Variant('s', self.PROXY))
                 gsettings.set_value(
                         "port",
-                        GLib.Variant('i', PROXYPORT))
+                        GLib.Variant('i', self.PROXYPORT))
                 gsettings = Gio.Settings.new("org.gnome.system.proxy.ftp")
                 gsettings.set_value(
                         "host",
-                        GLib.Variant('s', PROXY))
+                        GLib.Variant('s', self.PROXY))
                 gsettings.set_value(
                         "port",
-                        GLib.Variant('i', PROXYPORT))
+                        GLib.Variant('i', self.PROXYPORT))
         self.get_proxy_settings()
 
     def get_mode(self):
@@ -230,17 +236,18 @@ if __name__ == "__main__":
         logger = initialize_logger('proxyzap.log', 'nolog', logging.INFO)
 
     # Get configuration values
-    SUBGW = config["proxyzap"]["SUBGW"].replace('"', '')
-    PROXY = config["proxyzap"]["PROXY"].replace('"', '')
-    PROXYPORT = int(config["proxyzap"]["PROXYPORT"].replace('"', ''))
-    PROXYIGNORE = config["proxyzap"]["PROXYIGNORE"].split(',')
+    SUBGW, PROFILE = config["proxyzap"]["SUBGW"].replace('"', '').split(':')
+
+    PROXY = config[PROFILE]["PROXY"].replace('"', '')
+    PROXYPORT = int(config[PROFILE]["PROXYPORT"].replace('"', ''))
+    PROXYIGNORE = config[PROFILE]["PROXYIGNORE"].split(',')
 
     while 1:
         gateway = get_gw()
         logger.debug("#### START LOOP ####")
         logger.debug("Gateway is %s" % gateway.group(1))
 
-        proxy_settings = GnomeProxy()
+        proxy_settings = GnomeProxy(PROXY, PROXYPORT, PROXYIGNORE)
         logger.debug("Proxy mode is %s" % proxy_settings.get_mode())
 
         if SUBGW == gateway.group(1):
