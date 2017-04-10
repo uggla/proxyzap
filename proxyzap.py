@@ -16,7 +16,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 try:
-    from gi.repository import Gio, GLib
+    from gi.repository import Gio, GLib, Notify
 except ImportError:
     print('Package python3-gobject-base is missing.')
     print('Please install it using "dnf install python3-gobject-base".')
@@ -81,6 +81,16 @@ def get_gw():
         logger.critical("Default gateway not found")
         sys.exit(1)
     return gateway
+
+
+def notify(msg):
+    Notify.init('proxyzap')
+    notif = Notify.Notification.new(
+      'proxyzap',  # titre
+      msg,  # message
+      'dialog-information'  # icon
+    )
+    notif.show()
 
 
 class GnomeProxy(object):
@@ -235,7 +245,9 @@ if __name__ == "__main__":
                     % (gateway.group(1), SUBGW))
             if proxy_settings.get_mode() != 'manual':
                 proxy_settings.set_proxy_settings("manual")
-                logger.info("Proxy has been set to manual")
+                msg = "Proxy has been set to manual"
+                notify(msg)
+                logger.info(msg)
                 logger.debug(
                         "Values : PROXY: %s, PORT: %s" % (PROXY, PROXYPORT))
                 logger.debug(
@@ -246,7 +258,9 @@ if __name__ == "__main__":
         else:
             if proxy_settings.get_mode() != 'none':
                 proxy_settings.set_proxy_settings("none")
-                logger.info("Proxy has been set to none")
+                msg = "Proxy has been set to none"
+                notify(msg)
+                logger.info(msg)
             else:
                 logger.debug("Proxy already set to none")
 
