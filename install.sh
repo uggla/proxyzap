@@ -28,12 +28,19 @@ KillSignal=SIGTERM
 WantedBy=default.target
 EOF
 
+# Create systemd local user config dir
+if [[ ! -d ~/.config/systemd ]]; then
+    mkdir -p ~/.config/systemd/user
+fi
+    
+    
 # Add it to systemd user configuration
 if [[ ! -f ~/.config/systemd/user/proxyzap.service ]]; then
-    # Use a physical link because symbolic link causes some
-    # systemd issues
-	ln $CURRENTDIR/proxyzap.service ~/.config/systemd/user/proxyzap.service
-fi
+     # Use a physical link because symbolic link causes some
+     # systemd issues
+ 	ln $CURRENTDIR/proxyzap.service ~/.config/systemd/user/proxyzap.service
+ fi
+
 
 # Start service
 systemctl --user enable proxyzap.service
