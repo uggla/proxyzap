@@ -11,6 +11,11 @@ A simple script/service to change Gnome3 proxy settings based on connected subne
 git clone https://github.com/uggla/proxyzap.git
 ```
 
+* Create the systemd service configuation directory.
+```
+mkdir -p  ~/.config/systemd/user
+```
+
 * Run the install.sh script. This script will create a systemd service file and link it with your systemd user settings.
 
 
