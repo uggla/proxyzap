@@ -222,6 +222,8 @@ class GnomeProxy(object):
 if __name__ == "__main__":
     '''Main application proxyzap'''
 
+    os.chdir(os.path.dirname(sys.argv[0]))
+
     config = configparser.ConfigParser()
     try:
         config.read('proxyzap.conf')
