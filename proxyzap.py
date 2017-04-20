@@ -82,10 +82,10 @@ def get_gw():
             cmd.split()).decode('utf-8').split('\n')
     gateway = re.search(r'default via (\d+.\d+.\d+.\d+)', route[0])
     if not gateway:
-        print("Default gateway not found")
-        logger.critical("Default gateway not found")
-        sys.exit(1)
-    return gateway
+        logger.error("Default gateway not found or " +
+                     "system not connected to any network")
+        return "NotSet"
+    return str(gateway.group(1))
 
 
 def notify(msg):
@@ -179,6 +179,9 @@ class GnomeProxy(object):
         gsettings.set_value(
                 "mode",
                 GLib.Variant('s', mode))
+        msg = "Proxy has been set to %s" % mode
+        notify(msg)
+        logger.info(msg)
 
         if mode == 'manual':
             if self.proxy_ignore != self.PROXYIGNORE:
@@ -210,6 +213,12 @@ class GnomeProxy(object):
                 gsettings.set_value(
                         "port",
                         GLib.Variant('i', self.PROXYPORT))
+                logger.debug("Values : PROXY: %s, PORT: %s" % (
+                        self.PROXY,
+                        self.PROXYPORT))
+                logger.debug("Ignoring proxy for : %s" % (str.join(
+                    ',', self.PROXYIGNORE)))
+
         self.get_proxy_settings()
 
     def get_mode(self):
@@ -245,36 +254,25 @@ if __name__ == "__main__":
     PROXYIGNORE = config[PROFILE]["PROXYIGNORE"].split(',')
 
     while 1:
-        gateway = get_gw()
         logger.debug("#### START LOOP ####")
-        logger.debug("Gateway is %s" % gateway.group(1))
+        gateway = get_gw()
+        logger.debug("Gateway is %s" % gateway)
 
         proxy_settings = GnomeProxy(PROXY, PROXYPORT, PROXYIGNORE)
         logger.debug("Proxy mode is %s" % proxy_settings.get_mode())
 
-        if SUBGW == gateway.group(1):
+        if SUBGW == gateway:
             logger.debug(
                     "Gateway (%s) is matching proxyzap SUBGW (%s) "
                     "configuration"
-                    % (gateway.group(1), SUBGW))
+                    % (gateway, SUBGW))
             if proxy_settings.get_mode() != 'manual':
                 proxy_settings.set_proxy_settings("manual")
-                msg = "Proxy has been set to manual"
-                notify(msg)
-                logger.info(msg)
-                logger.debug(
-                        "Values : PROXY: %s, PORT: %s" % (PROXY, PROXYPORT))
-                logger.debug(
-                        "Ignoring proxy for : %s" % (
-                            str.join(',', PROXYIGNORE)))
             else:
                 logger.debug("Proxy already set to manual")
         else:
             if proxy_settings.get_mode() != 'none':
                 proxy_settings.set_proxy_settings("none")
-                msg = "Proxy has been set to none"
-                notify(msg)
-                logger.info(msg)
             else:
                 logger.debug("Proxy already set to none")
 
