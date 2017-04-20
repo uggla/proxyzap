@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
     config = configparser.ConfigParser()
     try:
-        config.read('proxyzap.conf')
+        config.read_file(open('proxyzap.conf'))
     except:
         print('Configuration file not found or invalid')
         sys.exit(1)
