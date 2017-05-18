@@ -262,7 +262,7 @@ class DnfProxy(object):
                 self.protocol = protocol
                 self.host = host
                 self.port = port
-        else: 
+        else:
             print("%s: missing section 'main'" % self.dnf_config_path)
 
 
@@ -282,21 +282,21 @@ class DnfProxy(object):
 
         '''
         dnfconf = configparser.ConfigParser()
-       #try:
-        dnfconf.read(self.dnf_config_path)
+        try:
+            dnfconf.read(self.dnf_config_path)
 
-        if dnfconf.has_section('main'):
-             url = 'http' + '://' + proxy + ':' + str(port)
-             dnfconf.set('main','proxy', url)
-             with open(self.dnf_config_path,'w') as f:
-                dnfconf.write(f)
-             self.get_proxy_settings()
-        else:
-             print("%s: missing section 'main'" % self.dnf_config_path)
+            if dnfconf.has_section('main'):
+                url = 'http' + '://' + proxy + ':' + str(port)
+                dnfconf.set('main','proxy', url)
+                with open(self.dnf_config_path,'w') as f:
+                    dnfconf.write(f)
+                self.get_proxy_settings()
+            else:
+                print("%s: missing section 'main'" % self.dnf_config_path)
 
-        self.get_proxy_settings()
-       # except:
-        #    print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
+            self.get_proxy_settings()
+        except:
+            print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
 
     def unset_proxy_settings(self):
         ''' Unset proxy settings in dnf.conf file
@@ -364,17 +364,16 @@ if __name__ == "__main__":
                     % (gateway, SUBGW))
             if proxy_settings.get_mode() != 'manual':
                 proxy_settings.set_proxy_settings("manual")
-
+                dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
             else:
                 logger.debug("Proxy already set to manual")
 
-            dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
         else:
             if proxy_settings.get_mode() != 'none':
                 proxy_settings.set_proxy_settings("none")
+                dnf_proxy.unset_proxy_settings()
             else:
                 logger.debug("Proxy already set to none")
-            dnf_proxy.unset_proxy_settings()
 
 
         logger.debug("#### END LOOP ####")
