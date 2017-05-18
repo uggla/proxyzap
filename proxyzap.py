@@ -225,6 +225,100 @@ class GnomeProxy(object):
         return self.proxy_mode
 
 
+import configparser
+import sys
+
+class DnfProxy(object):
+
+    '''
+    Manipulate dnf proxy settings
+    works only with http proxies
+    '''
+
+    def __init__(self):
+
+        self.protocol = None
+        self.host = None
+        self.port = None
+        self.dnf_config_path = "/etc/dnf/dnf.conf"
+        self.get_proxy_settings()
+
+
+
+    def get_proxy_settings(self):
+
+        dnfconf = configparser.ConfigParser()
+        try:
+            with open(self.dnf_config_path,'r') as f:
+                dnfconf.read_file(f)
+        except:
+            print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
+            sys.exit(1)
+
+
+        if dnfconf.has_section('main'):
+            if dnfconf.has_option('main','proxy'):
+                protocol, host, port =  dnfconf.get('main','proxy').replace("//","").split(":")
+                self.protocol = protocol
+                self.host = host
+                self.port = port
+        else: 
+            print("%s: missing section 'main'" % self.dnf_config_path)
+
+
+
+    def get_config(self):
+        conf = {
+                'protocol': self.protocol,
+                'host': self.host,
+                'port': self.port
+                }
+        return conf
+
+
+    def set_proxy_settings(self, proxy, port):
+        ''' Set proxy values inf dnf.conf file
+
+
+        '''
+        dnfconf = configparser.ConfigParser()
+       #try:
+        dnfconf.read(self.dnf_config_path)
+
+        if dnfconf.has_section('main'):
+             url = 'http' + '://' + proxy + ':' + str(port)
+             dnfconf.set('main','proxy', url)
+             with open(self.dnf_config_path,'w') as f:
+                dnfconf.write(f)
+             self.get_proxy_settings()
+        else:
+             print("%s: missing section 'main'" % self.dnf_config_path)
+
+        self.get_proxy_settings()
+       # except:
+        #    print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
+
+    def unset_proxy_settings(self):
+        ''' Unset proxy settings in dnf.conf file
+
+
+        '''
+        dnfconf = configparser.ConfigParser()
+        dnfconf.read(self.dnf_config_path)
+
+        if dnfconf.has_section('main'):
+            if dnfconf.has_option('main','proxy'):
+                 dnfconf.remove_option('main','proxy')
+                 with open(self.dnf_config_path,'w') as f:
+                    dnfconf.write(f)
+
+        else:
+             print("%s: missing section 'main'" % self.dnf_config_path)
+
+        self.get_proxy_settings()
+
+
+
 ############################################################
 # MAIN
 ############################################################
@@ -259,6 +353,8 @@ if __name__ == "__main__":
         logger.debug("Gateway is %s" % gateway)
 
         proxy_settings = GnomeProxy(PROXY, PROXYPORT, PROXYIGNORE)
+        dnf_proxy = DnfProxy()
+
         logger.debug("Proxy mode is %s" % proxy_settings.get_mode())
 
         if SUBGW == gateway:
@@ -268,13 +364,18 @@ if __name__ == "__main__":
                     % (gateway, SUBGW))
             if proxy_settings.get_mode() != 'manual':
                 proxy_settings.set_proxy_settings("manual")
+
             else:
                 logger.debug("Proxy already set to manual")
+
+            dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
         else:
             if proxy_settings.get_mode() != 'none':
                 proxy_settings.set_proxy_settings("none")
             else:
                 logger.debug("Proxy already set to none")
+            dnf_proxy.unset_proxy_settings()
+
 
         logger.debug("#### END LOOP ####")
         time.sleep(10)
