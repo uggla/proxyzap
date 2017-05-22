@@ -364,17 +364,17 @@ if __name__ == "__main__":
                     % (gateway, SUBGW))
             if proxy_settings.get_mode() != 'manual':
                 proxy_settings.set_proxy_settings("manual")
-                dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
             else:
                 logger.debug("Proxy already set to manual")
+            dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
 
         else:
             if proxy_settings.get_mode() != 'none':
                 proxy_settings.set_proxy_settings("none")
-                dnf_proxy.unset_proxy_settings()
             else:
                 logger.debug("Proxy already set to none")
 
+            dnf_proxy.unset_proxy_settings()
 
         logger.debug("#### END LOOP ####")
         time.sleep(10)
