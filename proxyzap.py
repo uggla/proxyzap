@@ -225,9 +225,6 @@ class GnomeProxy(object):
         return self.proxy_mode
 
 
-import configparser
-import sys
-
 class DnfProxy(object):
 
     '''
@@ -252,7 +249,8 @@ class DnfProxy(object):
             with open(self.dnf_config_path,'r') as f:
                 dnfconf.read_file(f)
         except:
-            print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
+            msg = "DNF configuration file %s missing or invalid"  % self.dnf_config_path
+            logger.error(msg)
             sys.exit(1)
 
 
@@ -263,8 +261,8 @@ class DnfProxy(object):
                 self.host = host
                 self.port = port
         else:
-            print("%s: missing section 'main'" % self.dnf_config_path)
-
+            msg = "%s: missing section 'main'" % self.dnf_config_path
+            logger.error(msg)
 
 
     def get_config(self):
@@ -279,7 +277,6 @@ class DnfProxy(object):
     def set_proxy_settings(self, proxy, port):
         ''' Set proxy values inf dnf.conf file
 
-
         '''
         dnfconf = configparser.ConfigParser()
         try:
@@ -291,16 +288,20 @@ class DnfProxy(object):
                 with open(self.dnf_config_path,'w') as f:
                     dnfconf.write(f)
                 self.get_proxy_settings()
+                msg = "Dnf proxy has been configured" 
+                logger.info(msg)
             else:
-                print("%s: missing section 'main'" % self.dnf_config_path)
+                msg = "%s: missing section 'main'" % self.dnf_config_path
+                logger.error(msg)
 
             self.get_proxy_settings()
         except:
-            print('DNF configuration file %s missing or invalid' % self.dnf_config_path)
+            msg = "DNF configuration file %s missing or invalid" % self.dnf_config_path
+            logger.error(msg)
+
 
     def unset_proxy_settings(self):
         ''' Unset proxy settings in dnf.conf file
-
 
         '''
         dnfconf = configparser.ConfigParser()
@@ -313,7 +314,8 @@ class DnfProxy(object):
                     dnfconf.write(f)
 
         else:
-             print("%s: missing section 'main'" % self.dnf_config_path)
+             msg = "%s: missing section 'main'" % self.dnf_config_path
+             logger.error(msg)
 
         self.get_proxy_settings()
 
