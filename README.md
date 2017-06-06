@@ -18,6 +18,11 @@ mkdir -p  ~/.config/systemd/user
 
 * Run the install.sh script. This script will create a systemd service file and link it with your systemd user settings.
 
+* If you want proxyzap to control your dnf proxy setting, run it with:
+```
+sudo ./install --dnfproxy
+```
+**NOTE: You must run the script with root privileges. It will change ownership of the dnf configuration file and will allow mode write access for the current user.**
 
 # Service management
 
