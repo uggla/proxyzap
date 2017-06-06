@@ -240,30 +240,28 @@ class DnfProxy(object):
         self.dnf_config_path = "/etc/dnf/dnf.conf"
         self.get_proxy_settings()
 
-
-
     def get_proxy_settings(self):
 
         dnfconf = configparser.ConfigParser()
         try:
-            with open(self.dnf_config_path,'r') as f:
+            with open(self.dnf_config_path, 'r') as f:
                 dnfconf.read_file(f)
         except:
-            msg = "DNF configuration file %s missing or invalid"  % self.dnf_config_path
+            msg = "DNF configuration file %s missing or invalid" \
+                    % self.dnf_config_path
             logger.error(msg)
             sys.exit(1)
 
-
         if dnfconf.has_section('main'):
-            if dnfconf.has_option('main','proxy'):
-                protocol, host, port =  dnfconf.get('main','proxy').replace("//","").split(":")
+            if dnfconf.has_option('main', 'proxy'):
+                protocol, host, port = dnfconf.get('main', 'proxy') \
+                        .replace("//", "").split(":")
                 self.protocol = protocol
                 self.host = host
                 self.port = port
         else:
             msg = "%s: missing section 'main'" % self.dnf_config_path
             logger.error(msg)
-
 
     def get_config(self):
         conf = {
@@ -272,7 +270,6 @@ class DnfProxy(object):
                 'port': self.port
                 }
         return conf
-
 
     def set_proxy_settings(self, proxy, port):
         ''' Set proxy values inf dnf.conf file
@@ -284,11 +281,11 @@ class DnfProxy(object):
 
             if dnfconf.has_section('main'):
                 url = 'http' + '://' + proxy + ':' + str(port)
-                dnfconf.set('main','proxy', url)
-                with open(self.dnf_config_path,'w') as f:
+                dnfconf.set('main', 'proxy', url)
+                with open(self.dnf_config_path, 'w') as f:
                     dnfconf.write(f)
                 self.get_proxy_settings()
-                msg = "Dnf proxy has been configured" 
+                msg = "Dnf proxy has been configured"
                 logger.info(msg)
             else:
                 msg = "%s: missing section 'main'" % self.dnf_config_path
@@ -296,7 +293,8 @@ class DnfProxy(object):
 
             self.get_proxy_settings()
         except:
-            msg = "DNF configuration file %s missing or invalid" % self.dnf_config_path
+            msg = "DNF configuration file %s missing or invalid" \
+                % self.dnf_config_path
             logger.error(msg)
             sys.exit(1)
 
@@ -308,17 +306,16 @@ class DnfProxy(object):
         dnfconf.read(self.dnf_config_path)
 
         if dnfconf.has_section('main'):
-            if dnfconf.has_option('main','proxy'):
-                 dnfconf.remove_option('main','proxy')
-                 with open(self.dnf_config_path,'w') as f:
+            if dnfconf.has_option('main', 'proxy'):
+                dnfconf.remove_option('main', 'proxy')
+                with open(self.dnf_config_path, 'w') as f:
                     dnfconf.write(f)
 
         else:
-             msg = "%s: missing section 'main'" % self.dnf_config_path
-             logger.error(msg)
+            msg = "%s: missing section 'main'" % self.dnf_config_path
+            logger.error(msg)
 
         self.get_proxy_settings()
-
 
 
 ############################################################
@@ -370,7 +367,7 @@ if __name__ == "__main__":
 
         proxy_settings = GnomeProxy(PROXY, PROXYPORT, PROXYIGNORE)
 
-        if DNF_PROXY_CONTROL == True:
+        if DNF_PROXY_CONTROL:
             dnf_proxy = DnfProxy()
 
         logger.debug("Proxy mode is %s" % proxy_settings.get_mode())
@@ -385,10 +382,10 @@ if __name__ == "__main__":
             else:
                 logger.debug("Proxy already set to manual")
 
-            if DNF_PROXY_CONTROL == True:
+            if DNF_PROXY_CONTROL:
                 if (not dnf_proxy.get_config()['host'] == PROXY) or \
-                    (not int(dnf_proxy.get_config['port']) == PROXYPORT):
-                    dnf_proxy.set_proxy_settings(PROXY,PROXYPORT)
+                   (not int(dnf_proxy.get_config['port']) == PROXYPORT):
+                    dnf_proxy.set_proxy_settings(PROXY, PROXYPORT)
                 else:
                     logger.debug("DNF Proxy already configured")
 
@@ -398,8 +395,8 @@ if __name__ == "__main__":
             else:
                 logger.debug("Proxy already set to none")
 
-            if DNF_PROXY_CONTROL == True:
-                if not dnf_proxy.get_config()['host'] ==  None:
+            if DNF_PROXY_CONTROL:
+                if not dnf_proxy.get_config()['host'] == None:
                     dnf_proxy.unset_proxy_settings()
                 else:
                     logger.debug("DNF Proxy already unset")
