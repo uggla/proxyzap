@@ -333,27 +333,35 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     try:
         config.read_file(open('proxyzap.conf'))
-    except:
-        print('Configuration file not found or invalid')
+
+        # Create logger
+        if config['proxyzap']['DEBUG'] == 'True':
+            logger = initialize_logger('proxyzap.log', 'nolog', logging.DEBUG)
+        else:
+            logger = initialize_logger('proxyzap.log', 'nolog', logging.INFO)
+
+        # Do we control DNF config ?
+        if config['proxyzap']['ENABLEPROXYDNF'] == 'True':
+            DNF_PROXY_CONTROL = True
+
+        # Get configuration values
+        SUBGW, PROFILE = \
+            config["proxyzap"]["SUBGW"].replace('"', '').split(':')
+
+        PROXY = config[PROFILE]["PROXY"].replace('"', '')
+        PROXYPORT = int(config[PROFILE]["PROXYPORT"].replace('"', ''))
+        PROXYIGNORE = config[PROFILE]["PROXYIGNORE"].split(',')
+
+    except (FileNotFoundError) as e:  # noqa
+        print('Configuration file not found.')
         sys.exit(1)
-
-    # Create logger
-    if config['proxyzap']['DEBUG'] == 'True':
-        logger = initialize_logger('proxyzap.log', 'nolog', logging.DEBUG)
-    else:
-        logger = initialize_logger('proxyzap.log', 'nolog', logging.INFO)
-
-    # Do we control DNF config ?
-    if config['proxyzap']['ENABLEPROXYDNF'] == 'True':
-        DNF_PROXY_CONTROL = True
-
-    # Get configuration values
-    SUBGW, PROFILE = config["proxyzap"]["SUBGW"].replace('"', '').split(':')
-
-    PROXY = config[PROFILE]["PROXY"].replace('"', '')
-    PROXYPORT = int(config[PROFILE]["PROXYPORT"].replace('"', ''))
-    PROXYIGNORE = config[PROFILE]["PROXYIGNORE"].split(',')
-
+    except (KeyError) as e:
+        print('Configuration file invalid key ' +
+              '{} is missing or not spelled correctly'.format(e))
+        sys.exit(1)
+    except (ValueError) as e:
+        print('SUBGW profile is not defined. ex: SUBGW = 192.168.0.254:work')
+        sys.exit(1)
 
     while 1:
         logger.debug("#### START LOOP ####")
