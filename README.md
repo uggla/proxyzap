@@ -20,7 +20,7 @@ mkdir -p  ~/.config/systemd/user
 
 * If you want proxyzap to control your dnf proxy setting, run it with:
 ```
-sudo ./install --dnfproxy
+sudo ./install.sh --dnfproxy
 ```
 **NOTE: You must run the script with root privileges. It will change ownership of the dnf configuration file and will allow mode write access for the current user.**
 
