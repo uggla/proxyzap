@@ -1,4 +1,4 @@
 *.log
 proxyzap.service
-iproxyzap.conf
+proxyzap.conf
 *.log.*
