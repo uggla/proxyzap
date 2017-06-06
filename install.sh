@@ -33,13 +33,21 @@ function enable_dnf_proxy(){
 
     #enable write access for user's group
     chmod g+w $DNF_CONF_FILE
- 
-    echo "Configuration done"
 }
 
+################################################################################
+# Main
+################################################################################
 
 ARGS=$(getopt -o hd --long "help,dnfproxy" -- "$@")
 
+if [[ -x /usr/bin/whoami ]]
+then
+    WHOAMI=$(whoami)
+else
+    echo "Program whoami is missing, please install it."
+    exit 1
+fi
 
 eval set -- "$ARGS"
 
@@ -56,12 +64,13 @@ done
 
 
 if [[  $ENABLE_DNF_PROXY -eq 1 ]]; then
-    
+
     #check if we are root
-    if [[ $EUID -ne 0 ]]; then
+    if [[ $WHOAMI != "root" ]]; then
         echo "WARNING: You are not running this script as root !"
-        echo "In order to enable the dnf proxy configuration,   "
-        echo "you must have root privileges                     "
+        echo "In order to enable the dnf proxy configuration,"
+        echo "you must have root privileges, try running the script using sudo"
+        echo "eg : sudo ./install.sh -d"
         exit 1
     fi
 
@@ -97,12 +106,11 @@ KillSignal=SIGTERM
 WantedBy=default.target
 EOF
 
+
 # Create systemd local user config dir
 if [[ ! -d $USERHOME/.config/systemd ]]; then
     mkdir -p $USERHOME/.config/systemd/user
 fi
-
-
 
 
 # Add it to systemd user configuration
@@ -114,6 +122,14 @@ if [[ ! -f $USERHOME/.config/systemd/user/proxyzap.service ]]; then
 
 
 # Start service
-su - $USER -c "systemctl --user enable proxyzap.service"
-su - $USER -c "systemctl --user start proxyzap.service"
+if [[ "$WHOAMI" == "$USER" ]]
+then
+    systemctl --user enable proxyzap.service
+    systemctl --user start proxyzap.service
+else
+    su - $USER -c "systemctl --user enable proxyzap.service"
+    su - $USER -c "systemctl --user start proxyzap.service"
+fi
 
+echo "Configuration done."
+exit 0
