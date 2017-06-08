@@ -1,5 +1,5 @@
 # proxyzap
-A simple script/service to change Gnome3 proxy settings based on connected subnet
+A simple script/service to change Gnome3 and dnf proxy settings based on connected subnet
 
 ![Screenshot1](screenshots/screenshot1.png)
 
@@ -22,7 +22,7 @@ mkdir -p  ~/.config/systemd/user
 ```
 sudo ./install.sh --dnfproxy
 ```
-**NOTE: You must run the script with root privileges. It will change ownership of the dnf configuration file and will allow mode write access for the current user.**
+**NOTE: You must run the script with root privileges. It will change group ownership of the dnf configuration file and will allow mode write access for the current user.**
 
 # Service management
 
