@@ -384,7 +384,7 @@ if __name__ == "__main__":
 
             if DNF_PROXY_CONTROL:
                 if (not dnf_proxy.get_config()['host'] == PROXY) or \
-                   (not int(dnf_proxy.get_config['port']) == PROXYPORT):
+                   (not int(dnf_proxy.get_config()['port']) == PROXYPORT):
                     dnf_proxy.set_proxy_settings(PROXY, PROXYPORT)
                 else:
                     logger.debug("DNF Proxy already configured")
