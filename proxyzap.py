@@ -386,8 +386,9 @@ if __name__ == "__main__":
                 if (dnf_proxy.get_config()['host'] != PROXY) or \
                     (int(dnf_proxy.get_config()['port']) != PROXYPORT):
                     dnf_proxy.set_proxy_settings(PROXY, PROXYPORT)
+                    logger.debug("Configured dnf proxy")
                 else:
-                    logger.debug("DNF Proxy already configured")
+                    logger.debug("Dnf proxy already configured")
 
         else:
             if proxy_settings.get_mode() != 'none':
@@ -398,8 +399,9 @@ if __name__ == "__main__":
             if DNF_PROXY_CONTROL:
                 if not dnf_proxy.get_config()['host'] == None:
                     dnf_proxy.unset_proxy_settings()
+                    logger.debug("Unset dnf proxy")
                 else:
-                    logger.debug("DNF Proxy already unset")
+                    logger.debug("Dnf Proxy already unset")
 
         logger.debug("#### END LOOP ####")
         time.sleep(10)
