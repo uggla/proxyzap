@@ -1,5 +1,5 @@
 # proxyzap
-A simple script/service to change Gnome3 proxy settings based on connected subnet
+A simple script/service to change Gnome3 and dnf proxy settings based on connected subnet
 
 ![Screenshot1](screenshots/screenshot1.png)
 
@@ -22,7 +22,7 @@ mkdir -p  ~/.config/systemd/user
 ```
 sudo ./install.sh --dnfproxy
 ```
-**NOTE: You must run the script with root privileges. It will change ownership of the dnf configuration file and will allow mode write access for the current user.**
+**NOTE: You must run the script with root privileges. It will change group ownership of the dnf configuration file and will allow mode write access for the current user.**
 
 # Service management
 
@@ -47,17 +47,21 @@ systemctl --user stop proxyzap.service
 
 ```ini
 [proxyzap]
-SUBGW = "192.168.0.254"
+SUBGW = "192.168.0.254:proxy_profile"
+ENABLEPROXYDNF = True
+DEBUG = True
+
+[proxy_profile]
 PROXY = "myproxy.mydomain.local"
 PROXYPORT = "8080"
 PROXYIGNORE = localhost, 127.0.0.0/8, ::1
-DEBUG = True
 ```
 
 * SUBGW: Is the gateway off the network that requires proxy settings.
 * PROXY: Proxy host name.
 * PROXYPORT: Proxy port used.
 * PROXYIGNORE: Hosts or subnets that do not need a proxy to connect to.
+* ENABLEPROXYDNF: Enable dnf proxy control.
 * DEBUG = True|False, set the log verbosity.
 
 
