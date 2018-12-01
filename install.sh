@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 #######################################################################
 #                    proxyzap installation script                     #
@@ -27,7 +27,7 @@ function enable_dnf_proxy() {
   echo "Configuring control of dnf proxy (file: $DNF_CONF_FILE)"
 
   #user's group owns the file
-  chown root:$USER $DNF_CONF_FILE
+  chown root:"$USER" "$DNF_CONF_FILE"
 
   #enable write access for user's group
   chmod g+w $DNF_CONF_FILE
@@ -83,14 +83,14 @@ if [[ $ENABLE_DNF_PROXY -eq 1 ]]; then
   enable_dnf_proxy
 fi
 
-CURRENTDIR=$(dirname $0)
-cd $CURRENTDIR
+CURRENTDIR=$(dirname "$0")
+cd "$CURRENTDIR"
 CURRENTDIR=$(pwd)
 
 #In case the script is run with sudo, make sure the systemd files are place within
 # the calling user's home
 
-USERHOME=$(eval echo ~$USER)
+USERHOME=$(eval echo ~"$USER")
 
 # Write a systemd file
 cat >proxyzap.service <<EOF
@@ -109,14 +109,14 @@ EOF
 
 # Create systemd local user config dir
 if [[ ! -d $USERHOME/.config/systemd ]]; then
-  mkdir -p $USERHOME/.config/systemd/user
+  mkdir -p "$USERHOME"/.config/systemd/user
 fi
 
 # Add it to systemd user configuration
 if [[ ! -f $USERHOME/.config/systemd/user/proxyzap.service ]]; then
   # Use a physical link because symbolic link causes some
   # systemd issues
-  ln $CURRENTDIR/proxyzap.service $USERHOME/.config/systemd/user/proxyzap.service
+  ln "$CURRENTDIR/proxyzap.service" "$USERHOME/.config/systemd/user/proxyzap.service"
 fi
 
 # Start service
@@ -124,8 +124,8 @@ if [[ "$WHOAMI" == "$USER" ]]; then
   systemctl --user enable proxyzap.service
   systemctl --user start proxyzap.service
 else
-  su - $USER -c "systemctl --user enable proxyzap.service"
-  su - $USER -c "systemctl --user start proxyzap.service"
+  su - "$USER" -c "systemctl --user enable proxyzap.service"
+  su - "$USER" -c "systemctl --user start proxyzap.service"
 fi
 
 echo "Configuration done."
