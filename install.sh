@@ -33,9 +33,9 @@ function enable_dnf_proxy() {
   chmod g+w $DNF_CONF_FILE
 }
 
-################################################################################
+###############################################################################
 # Main
-################################################################################
+###############################################################################
 
 ARGS=$(getopt -o hd --long "help,dnfproxy" -- "$@")
 
@@ -87,8 +87,8 @@ CURRENTDIR=$(dirname "$0")
 cd "$CURRENTDIR"
 CURRENTDIR=$(pwd)
 
-#In case the script is run with sudo, make sure the systemd files are place within
-# the calling user's home
+# In case the script is run with sudo, make sure the systemd files are place
+# within the calling user's home
 
 USERHOME=$(eval echo ~"$USER")
 
@@ -116,7 +116,8 @@ fi
 if [[ ! -f $USERHOME/.config/systemd/user/proxyzap.service ]]; then
   # Use a physical link because symbolic link causes some
   # systemd issues
-  ln "$CURRENTDIR/proxyzap.service" "$USERHOME/.config/systemd/user/proxyzap.service"
+  ln "$CURRENTDIR/proxyzap.service" \
+    "$USERHOME/.config/systemd/user/proxyzap.service"
 fi
 
 # Start service
